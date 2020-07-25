@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'g#z!t2arf%p7$b&3*^x6mh3bpa5q@&4r&8lu*yeg-kg7c&6703'
+SECRET_KEY = '# use your secret key over here '
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -128,5 +128,5 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
+LOGIN_URL   = 'home:login'
 LOGIN_REDIRECT_URL  = 'home:home'
