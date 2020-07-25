@@ -37,7 +37,12 @@
 
               <a class="nav-item nav-link" href="{% url 'home:create' %}">New Post</a>
               <a class="nav-item nav-link" href="{% url 'home:logout' %}">Logout</a>
-              <a class="nav-item nav-link" href="{% url 'home:profile' %}">Profile</a>
+              {% if create == 1 %}
+              <a class="nav-item nav-link" href="{% url 'home:createprofile' %}">Create Profile</a>
+
+              {% else %}
+              <a class="nav-item nav-link" href="{% url 'home:updateprofile' user.profile.pk %}">Update Profile</a>
+              {% endif %}
 
               {% else %}
               <a class="nav-item nav-link" href="{% url 'home:login' %}">Login</a>

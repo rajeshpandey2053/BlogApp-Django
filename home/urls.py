@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (home, about,
+from .views import (about,
                     PostListView,
                     PostCreateView,
                     PostDetailView,
@@ -20,7 +20,8 @@ urlpatterns = [
     path('about/', about, name = 'about'),
     path('register/', views.register, name = 'register'),
 
-    path('profile/', views.profile, name = 'profile'),
+    path('createprofile/', views.ProfileCreateView.as_view(), name = 'createprofile'),
+    path('updateprofile/<int:pk>', views.ProfileUpdateView.as_view(), name = 'updateprofile'),
     path('login/', auth_views.LoginView.as_view(template_name = 'users/login.html'), name = 'login'),
     path('logout/', auth_views.LogoutView.as_view(template_name = 'users/logout.html'), name = 'logout'),
 
