@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '# user you secret key over here '
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -130,3 +130,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_URL   = 'home:login'
 LOGIN_REDIRECT_URL  = 'home:home'
+
+AUTHENTICATION_BACKENDS = ('users.models.EmailBackend',)
