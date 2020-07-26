@@ -18,7 +18,8 @@ urlpatterns = [
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name = 'delete' ),
 
     path('about/', about, name = 'about'),
-    path('register/', views.register, name = 'register'),
+    path('register/', views.RegisterView.as_view(), name = 'register'),
+    path('confirm-email/<str:user_id>/<str:token>/', views.ConfirmRegistrationView.as_view(), name='confirm_email'),
 
     path('createprofile/', views.ProfileCreateView.as_view(), name = 'createprofile'),
     path('updateprofile/<int:pk>', views.ProfileUpdateView.as_view(), name = 'updateprofile'),

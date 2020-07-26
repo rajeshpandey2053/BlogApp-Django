@@ -8,17 +8,91 @@ from .models import Profile
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-def register(request):
-    if request.method == 'POST':
+# start here for email registrations
+import json
+from django.conf import settings
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User, Group, Permission
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
+from django.template.loader import get_template
+from django.db import transaction
+from django.db.models import Q
+from django.http import HttpResponse
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.shortcuts import render, redirect, reverse, get_object_or_404
+
+from django.views import View
+
+from .tokens import user_tokenizer
+
+class RegisterView(View):
+    def get(self, request):
+        return render(request, 'users/register.html', { 'form': UserRegisterForm() })
+
+    def post(self, request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}!')
-            return redirect('home:login')
-    else:
-        form = UserRegisterForm()
-    return render(request, 'users/register.html', {'form': form})
+            user = form.save(commit=False)
+            user.is_valid = False
+            user.save()
+            token = user_tokenizer.make_token(user)
+            user_id = urlsafe_base64_encode(force_bytes(user.id))
+            url = 'http://localhost:8000' + reverse('home:confirm_email', kwargs={'user_id': user_id, 'token': token})
+            message = get_template('users/register_email.html').render({
+              'confirm_url': url
+            })
+            mail = EmailMessage('Django users Email Confirmation', message, to=[user.email], from_email=settings.EMAIL_HOST_USER)
+            mail.content_subtype = 'html'
+            mail.send()
+
+            return render(request, 'users/login.html', {
+              'form': AuthenticationForm(),
+              'message': f'A confirmation email has been sent to {user.email}. Please confirm to finish registering'
+            })
+
+        return render(request, 'users/register.html', { 'form': form })
+
+class ConfirmRegistrationView(View):
+    def get(self, request, user_id, token):
+        user_id = force_text(urlsafe_base64_decode(user_id))
+        
+        user = User.objects.get(pk=user_id)
+
+        context = {
+          'form': AuthenticationForm(),
+          'message': 'Registration confirmation error . Please click the reset password to generate a new confirmation email.'
+        }
+        if user and user_tokenizer.check_token(user, token):
+            user.is_valid = True
+            user.save()
+            context['message'] = 'Registration complete. Please login'
+
+        return render(request, 'users/login.html', context)
+    
+            
+
+
+
+    # END HERE email registration
+
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserRegisterForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             username = form.cleaned_data.get('username')
+#             messages.success(request, f'Account created for {username}!')
+#             return redirect('home:login')
+#     else:
+#         form = UserRegisterForm()
+#     return render(request, 'users/register.html', {'form': form})
+
+
 
 
 # @login_required(login_url='home:login')

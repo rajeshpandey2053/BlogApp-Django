@@ -132,3 +132,11 @@ LOGIN_URL   = 'home:login'
 LOGIN_REDIRECT_URL  = 'home:home'
 
 AUTHENTICATION_BACKENDS = ('users.models.EmailBackend',)
+
+# for registering user with email
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+PASSWORD_RESET_TIMEOUT_DAYS = 2
