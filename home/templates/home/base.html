@@ -53,11 +53,18 @@
         </div>
       </nav>
     </header>
-    <main role="main" class="container">
-      <div class="row">
-        <div class="col-md-8">
-          {% block content %}{% endblock %}
-        </div>
+      <main role="main" class="container">
+        <div class="row">
+          <div class="col-md-8">
+            {% if message %}
+              {% for msg in message %}
+                <div class="alert alert-{{ msg.tags }}">
+                  {{ msg }}
+                </div>
+              {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+          </div>
         <div class="col-md-4">
           <div class="content-section">
             <h3>Our Sidebar</h3>

@@ -26,6 +26,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 
 from django.views import View
+from django.contrib.auth.views import LoginView
+
 
 from .tokens import user_tokenizer
 
@@ -56,23 +58,32 @@ class RegisterView(View):
 
         return render(request, 'users/register.html', { 'form': form })
 
-class ConfirmRegistrationView(View):
+class ConfirmRegistrationView(LoginView):
+
     def get(self, request, user_id, token):
         user_id = force_text(urlsafe_base64_decode(user_id))
         
         user = User.objects.get(pk=user_id)
 
         context = {
-          'form': AuthenticationForm(),
-          'message': 'Registration confirmation error . Please click the reset password to generate a new confirmation email.'
+          'form': AuthenticationForm()
         }
         if user and user_tokenizer.check_token(user, token):
             user.is_valid = True
             user.save()
-            context['message'] = 'Registration complete. Please login'
+            
 
         return render(request, 'users/login.html', context)
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if Profile.objects.filter(pk = ram):
+            new_context_entry = 0
+        else:          
+            new_context_entry = 1
+        context["create"] = new_context_entry
+        return context
+
             
 
 
@@ -161,7 +172,7 @@ class ProfileCreateView(CreateView):
         return super().form_valid(form)
 
 
-# @method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name='dispatch')
 class ProfileUpdateView(UpdateView):
     form_class = ProfileForm
     model = Profile
